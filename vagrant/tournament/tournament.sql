@@ -8,5 +8,24 @@
 drop database if exists tournament;
 create database tournament;
 \c tournament;
-
-
+create table players
+(
+    playerId serial primary key,
+    playerName varchar(40)
+);
+create table matches
+(
+    matchId serial primary key,
+    round integer,
+    playerA integer references players,
+    playerB integer references players,
+    winPlayerId integer,
+    losPlayerId integer
+);
+create table standings
+(
+    playerId integer references players,
+    playerName varchar(40),
+    wins integer,
+    matches integer
+);
