@@ -24,6 +24,8 @@ def deletePlayers():
     """Remove all the player records from the database."""
     DB = connect()
     cur = DB.cursor()
+    cur.execute("delete from standings;")
+    DB.commit()
     cur.execute("delete from players;")
     DB.commit()
     DB.close()
@@ -52,6 +54,8 @@ def registerPlayer(name):
     cur = DB.cursor()
     cur.execute("insert into players (playername) values (%s);", (name,))
     DB.commit()
+    cur.execute("insert into standings (playerid, playername, wins, matches) (select p.playerid, p.playername, 0, 0 from players p where p.playername = %s);", (name,))
+    DB.commit()
     DB.close()
 
 
@@ -68,7 +72,12 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
-
+    DB = connect()
+    cur = DB.cursor()
+    cur.execute("select playerid, playername, wins, matches from standings order by wins desc, playername;")
+    result = cur.fetchall()
+    DB.close()
+    return result
 
 def reportMatch(winner, loser):
     """Records the outcome of a single match between two players.
