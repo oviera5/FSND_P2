@@ -4,6 +4,7 @@
 #
 
 import psycopg2
+# import random from randint
 
 
 def connect():
@@ -54,7 +55,9 @@ def registerPlayer(name):
     cur = DB.cursor()
     cur.execute("insert into players (playername) values (%s);", (name,))
     DB.commit()
-    cur.execute("insert into standings (playerid, playername, wins, matches) (select p.playerid, p.playername, 0, 0 from players p where p.playername = %s);", (name,))
+    cur.execute("""insert into standings (playerid, playername, wins, matches) 
+        (select p.playerid, p.playername, 0, 0 from players p where 
+        p.playername = %s);""", (name,))
     DB.commit()
     DB.close()
 
@@ -74,7 +77,8 @@ def playerStandings():
     """
     DB = connect()
     cur = DB.cursor()
-    cur.execute("select playerid, playername, wins, matches from standings order by wins desc, playername;")
+    cur.execute("""select playerid, playername, wins, matches from standings 
+        order by wins desc, playerid;""")
     result = cur.fetchall()
     DB.close()
     return result
@@ -86,6 +90,19 @@ def reportMatch(winner, loser):
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
+    DB = connect()
+    cur = DB.cursor()
+    cur.execute("""insert into matches (playera, playerb, winplayerid, 
+        losplayerid) values (%s, %s, %s, %s);""", 
+        (winner,loser,winner,loser,))
+    DB.commit()
+    cur.execute("""update standings set matches = matches + 1 where playerid 
+        in (%s, %s);""", (winner, loser,))
+    DB.commit()
+    cur.execute("""update standings set wins = wins + 1 where playerid = %s;"""
+        , (winner,))
+    DB.commit()    
+    DB.close()    
  
  
 def swissPairings():
