@@ -8,6 +8,10 @@
 drop database if exists tournament;
 create database tournament;
 \c tournament;
+create table tour
+(
+    tourId serial primary key
+)
 create table players
 (
     playerId serial primary key,

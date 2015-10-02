@@ -1,4 +1,4 @@
-rdb-fullstack
+FSND_P2
 =============
 
-Common code for the Relational Databases and Full Stack Fundamentals courses
+Project 2 for Full Stack Web Developer Nanodegree

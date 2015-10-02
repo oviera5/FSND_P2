@@ -139,3 +139,9 @@ if __name__ == '__main__':
     testReportMatches()
     testPairings()
     print "Success!  All tests pass!"
+    print
+    while True:
+        n = raw_input("Would you like to Start A New Tournamemnt? y/n: ")
+        if n.strip() == 'n' or n.strip() == 'N':
+            break
+        print 'You did not press n'      
