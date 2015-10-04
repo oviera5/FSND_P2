@@ -3,6 +3,9 @@
 # Test cases for tournament.py
 
 from tournament import *
+import random 
+import math
+
 
 
 def testDeleteMatches():
@@ -129,19 +132,90 @@ def testPairings():
     print "8. After one match, players with one win are paired."
 
 
-if __name__ == '__main__':
-    testDeleteMatches()
-    testDelete()
-    testCount()
-    testRegister()
-    testRegisterCountDelete()
-    testStandingsBeforeMatches()
-    testReportMatches()
-    testPairings()
-    print "Success!  All tests pass!"
+def enterPlayer():
+
+    print "Please enter 4 players or more."
     print
+    p = 'y'
+    x = countPlayers()
+    while x < 4 or (p.strip() == 'y' or p.strip() == 'y'):
+
+        if x >= 4:
+            p = raw_input("Would you like to enter more players? y/n: ")
+
+        if p.strip() == 'y' or p.strip() == 'y': 
+            pname = raw_input("Enter player's name :")
+            registerPlayer(pname)
+        
+        x = countPlayers()
+
+    return x        
+
+
+def generateRounds(p):
+
+    r = int(math.log(p,2))
+    return r
+
+def playtour():
+    
+    numOfPlayers = enterPlayer()
+    numOfRounds = generateRounds(numOfPlayers)
+    matchesPerRound = numOfPlayers/2
+
+    for rnd in range(0, numOfRounds):
+
+        if rnd == 0:
+            standings = playerStandings()
+            listOfPlayers = [row[0] for row in standings]
+            random.shuffle(listOfPlayers)
+            x = listOfPlayers
+         
+            for match in zip(x[0::2], x[1::2]):
+                flip = random.randint(0, 1)
+                if flip == 0:
+                    winer = match[0]
+                    loser = match[1]
+                else:
+                    winer = match[1]
+                    loser = match[0]    
+                reportMatch(winer, loser, rnd+1)
+        else:
+            pairings = swissPairings()
+            a = [row[0] for row in pairings]
+            b = [row[2] for row in pairings]
+             
+            for match in range(0, matchesPerRound):
+                flip = random.randint(0,1)   # add some randomness to outcome
+                if flip == 0:
+                    winer = a[match] 
+                    loser = b[match]
+                else:
+                    winer = b[match]
+                    loser = a[match]    
+                reportMatch(winer, loser, rnd+1)
+
+    print "The winner is " + theWinner()             
+
+
+if __name__ == '__main__':
+    # testDeleteMatches()
+    # testDelete()
+    # testCount()
+    # testRegister()
+    # testRegisterCountDelete()
+    # testStandingsBeforeMatches()
+    # testReportMatches()
+    # testPairings()
+    # print "Success!  All tests pass!"
+    # print
     while True:
         n = raw_input("Would you like to Start A New Tournamemnt? y/n: ")
         if n.strip() == 'n' or n.strip() == 'N':
             break
-        print 'You did not press n'      
+        elif n.strip() == 'y' or n.strip() == 'Y':
+            deleteMatches()
+            deletePlayers()
+            playtour()
+        else:        
+            print 'You did not press y or n'      

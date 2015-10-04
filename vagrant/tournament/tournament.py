@@ -84,7 +84,7 @@ def playerStandings():
     return result
 
 
-def reportMatch(winner, loser):
+def reportMatch(winner, loser, rnd=1):
     """Records the outcome of a single match between two players.
 
     Args:
@@ -93,9 +93,9 @@ def reportMatch(winner, loser):
     """
     DB = connect()
     cur = DB.cursor()
-    cur.execute("""insert into matches (playera, playerb, winplayerid,
-                losplayerid) values (%s, %s, %s, %s);""",
-                (winner, loser, winner, loser,))
+    cur.execute("""insert into matches (round, winplayerid,
+                losplayerid) values (%s, %s, %s);""",
+                (rnd, winner, loser,))
     DB.commit()
     cur.execute("""update standings set matches = matches + 1 where playerid
         in (%s, %s);""", (winner, loser,))
@@ -132,3 +132,13 @@ def swissPairings():
     result = cur.fetchall()
     DB.close()
     return result
+
+
+def theWinner():
+    """Returns the player name of the winner."""
+    DB = connect()
+    cur = DB.cursor()
+    cur.execute("select playername from standings where (wins/matches) = 1")
+    result = cur.fetchone()
+    DB.close()
+    return result[0]    

@@ -8,10 +8,6 @@
 drop database if exists tournament;
 create database tournament;
 \c tournament;
-create table tour
-(
-    tourId serial primary key
-)
 create table players
 (
     playerId serial primary key,
@@ -21,8 +17,6 @@ create table matches
 (
     matchId serial primary key,
     round integer,
-    playerA integer references players,
-    playerB integer references players,
     winPlayerId integer,
     losPlayerId integer
 );
@@ -33,3 +27,10 @@ create table standings
     wins integer,
     matches integer
 );
+
+-- possible view
+-- select a.*
+--      , b.*
+--   from players a
+--  cross join players b
+-- tournament-> where a.playerid != b.playerid;
