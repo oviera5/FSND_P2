@@ -130,7 +130,10 @@ def swissPairings(rnd=1):
         join standings s2 on s1.playerid < s2.playerid
         and s1.wins = s2.wins
         and s1.matches = s2.matches
-        where s1.matches = %s and s2.matches = %s
+        left join trackmatches t on s1.playerid = t.playera
+        and s2.playerid = t.playerb
+        where t.wins is null 
+        and s1.matches = %s and s2.matches = %s
         order by s1.playerid;""", (rnd, rnd,))
     result = cur.fetchall()
     DB.close()
