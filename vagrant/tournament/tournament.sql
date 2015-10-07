@@ -27,10 +27,26 @@ create table standings
     wins integer,
     matches integer
 );
+create view trackmatches as
+(    
+    select a.winplayerid as playerA,
+           a.losplayerid as playerB, 
+           s.wins
+      from matches a 
+      left join standings s on a.losplayerId = s.playerId
 
--- possible view
--- select a.*
---      , b.*
---   from players a
---  cross join players b
--- tournament-> where a.playerid != b.playerid;
+    union all
+
+    select b.losplayerid, 
+           b.winplayerid, 
+           s.wins
+      from matches b 
+      left join standings s on b.winplayerId = s.playerid
+);
+create view oppmatchwin as 
+(
+    select playera as playerid,
+           sum(wins) as omw
+      from trackmatches
+     group by playera 
+);

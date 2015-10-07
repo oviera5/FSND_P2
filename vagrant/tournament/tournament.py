@@ -77,8 +77,9 @@ def playerStandings():
     """
     DB = connect()
     cur = DB.cursor()
-    cur.execute("""select playerid, playername, wins, matches from standings
-        order by wins desc, playerid;""")
+    cur.execute("""select s.playerid, s.playername, s.wins, s.matches
+       from standings s left join oppmatchwin o on s.playerid = o.playerid
+       order by s.wins desc , o.omw desc, s.playerid;""")
     result = cur.fetchall()
     DB.close()
     return result
@@ -106,7 +107,7 @@ def reportMatch(winner, loser, rnd=1):
     DB.close()
 
 
-def swissPairings():
+def swissPairings(rnd=1):
     """Returns a list of pairs of players for the next round of a match.
 
     Assuming that there are an even number of players registered, each player
@@ -127,8 +128,10 @@ def swissPairings():
         s2.playerid, s2.playername
         from standings s1
         join standings s2 on s1.playerid < s2.playerid
-        and (s1.wins/s1.matches)=(s2.wins/s2.matches)
-        order by s1.playerid;""")
+        and s1.wins = s2.wins
+        and s1.matches = s2.matches
+        where s1.matches = %s and s2.matches = %s
+        order by s1.playerid;""", (rnd, rnd,))
     result = cur.fetchall()
     DB.close()
     return result
@@ -141,4 +144,4 @@ def theWinner():
     cur.execute("select playername from standings where (wins/matches) = 1")
     result = cur.fetchone()
     DB.close()
-    return result[0]    
+    return result[0]

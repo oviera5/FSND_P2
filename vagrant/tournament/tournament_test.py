@@ -3,9 +3,8 @@
 # Test cases for tournament.py
 
 from tournament import *
-import random 
+import random
 import math
-
 
 
 def testDeleteMatches():
@@ -134,31 +133,33 @@ def testPairings():
 
 def enterPlayer():
 
-    print "Please enter 4 players or more."
+    print "Please enter 4 or 8 or 16 players."
     print
     p = 'y'
     x = countPlayers()
-    while x < 4 or (p.strip() == 'y' or p.strip() == 'y'):
+    while x < 16:
 
-        if x >= 4:
+        if x == 4 or x == 8 or x == 16:
             p = raw_input("Would you like to enter more players? y/n: ")
 
-        if p.strip() == 'y' or p.strip() == 'y': 
+        if p.strip() == 'y' or p.strip() == 'y':
             pname = raw_input("Enter player's name :")
             registerPlayer(pname)
-        
+        else:
+            break
         x = countPlayers()
 
-    return x        
+    return x
 
 
 def generateRounds(p):
 
-    r = int(math.log(p,2))
+    r = int(math.log(p, 2))
     return r
 
+
 def playtour():
-    
+
     numOfPlayers = enterPlayer()
     numOfRounds = generateRounds(numOfPlayers)
     matchesPerRound = numOfPlayers/2
@@ -170,7 +171,7 @@ def playtour():
             listOfPlayers = [row[0] for row in standings]
             random.shuffle(listOfPlayers)
             x = listOfPlayers
-         
+
             for match in zip(x[0::2], x[1::2]):
                 flip = random.randint(0, 1)
                 if flip == 0:
@@ -178,24 +179,26 @@ def playtour():
                     loser = match[1]
                 else:
                     winer = match[1]
-                    loser = match[0]    
+                    loser = match[0]
                 reportMatch(winer, loser, rnd+1)
         else:
-            pairings = swissPairings()
-            a = [row[0] for row in pairings]
-            b = [row[2] for row in pairings]
-             
+
             for match in range(0, matchesPerRound):
-                flip = random.randint(0,1)   # add some randomness to outcome
+
+                pairings = swissPairings(rnd)
+                a = [row[0] for row in pairings]
+                b = [row[2] for row in pairings]
+
+                flip = random.randint(0, 1)   # add some randomness to outcome
                 if flip == 0:
-                    winer = a[match] 
-                    loser = b[match]
+                    winer = a[0]
+                    loser = b[0]
                 else:
-                    winer = b[match]
-                    loser = a[match]    
+                    winer = b[0]
+                    loser = a[0]
                 reportMatch(winer, loser, rnd+1)
 
-    print "The winner is " + theWinner()             
+    print "The winner is " + theWinner()
 
 
 if __name__ == '__main__':
@@ -217,5 +220,5 @@ if __name__ == '__main__':
             deleteMatches()
             deletePlayers()
             playtour()
-        else:        
-            print 'You did not press y or n'      
+        else:
+            print 'You did not press y or n'
