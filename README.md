@@ -38,7 +38,9 @@ Installation instructions
 
              a) vagrant up
              b) vagrant ssh
-             c) psql
+             c) cd /vagrant
+             d) cd tournament
+             e) psql
 
         09 - Type the following to import schema and exit the database: 
 

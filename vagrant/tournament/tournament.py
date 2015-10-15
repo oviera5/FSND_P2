@@ -4,7 +4,6 @@
 #
 
 import psycopg2
-# import random from randint
 
 
 def connect():
