@@ -50,3 +50,21 @@ create view oppmatchwin as
       from trackmatches
      group by playera 
 );
+create view possiblematches as
+(
+    select a.playerid playera,
+           b.playerid playerb
+      from players a
+     cross join players b
+     where a.playerid <> b.playerid
+);
+create view availablematches as
+(
+    select playera,
+           playerb
+      from possiblematches p
+    except
+    select playera,
+           playerb
+      from trackmatches
+);

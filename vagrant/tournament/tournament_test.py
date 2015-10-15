@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Test cases for tournament.py
+# Start of test cases for tournament.py
 
 from tournament import *
 import random
@@ -8,17 +8,20 @@ import math
 
 
 def testDeleteMatches():
+    # Delete all previous matches held in the database.
     deleteMatches()
     print "1. Old matches can be deleted."
 
 
 def testDelete():
+    # Delete all previous matches and players held in the database.
     deleteMatches()
     deletePlayers()
     print "2. Player records can be deleted."
 
 
 def testCount():
+    # Test the number of players in the database.
     deleteMatches()
     deletePlayers()
     c = countPlayers()
@@ -31,6 +34,7 @@ def testCount():
 
 
 def testRegister():
+    # Test the number of players after registering one player.
     deleteMatches()
     deletePlayers()
     registerPlayer("Chandra Nalaar")
@@ -42,6 +46,7 @@ def testRegister():
 
 
 def testRegisterCountDelete():
+    # Test the number of players after registering four players.
     deleteMatches()
     deletePlayers()
     registerPlayer("Markov Chaney")
@@ -60,6 +65,7 @@ def testRegisterCountDelete():
 
 
 def testStandingsBeforeMatches():
+    # Test the standings before any matches have been recorded.
     deleteMatches()
     deletePlayers()
     registerPlayer("Melpomene Murray")
@@ -84,6 +90,7 @@ def testStandingsBeforeMatches():
 
 
 def testReportMatches():
+    # Test the standings after recording two matches.
     deleteMatches()
     deletePlayers()
     registerPlayer("Bruno Walton")
@@ -108,6 +115,7 @@ def testReportMatches():
 
 
 def testPairings():
+    # Test the pairings after recording two matches.
     deleteMatches()
     deletePlayers()
     registerPlayer("Twilight Sparkle")
@@ -131,7 +139,12 @@ def testPairings():
     print "8. After one match, players with one win are paired."
 
 
+# End of test cases for tournament.py
+
+# The following three functions provide the algorithm for the tournament.
+
 def enterPlayer():
+    # Prompt the user to enter player names for the tournament.
 
     print "Please enter 4 or 8 or 16 players."
     print
@@ -153,12 +166,14 @@ def enterPlayer():
 
 
 def generateRounds(p):
+    # Provides the number of rounds based on the number players entered.
 
     r = int(math.log(p, 2))
     return r
 
 
 def playtour():
+    # Loops through rounds, records results, and displays winner.
 
     numOfPlayers = enterPlayer()
     numOfRounds = generateRounds(numOfPlayers)
@@ -189,29 +204,49 @@ def playtour():
                 a = [row[0] for row in pairings]
                 b = [row[2] for row in pairings]
 
-                flip = random.randint(0, 1)   # add some randomness to outcome
+                y = 0
+
+                # Check pairs for empty tuples due to eliminating rematches
+
+                for pair in range(0, len(a)):
+                    x = checkPairing(a[pair], b[pair], rnd)
+                    if x > y:
+                        y = x
+                        w = a[pair]
+                        l = b[pair]
+
+                if y == 0:
+                    w = a[0]
+                    l = b[0]
+
+                # add some randomness to outcome
+                flip = random.randint(0, 1)
                 if flip == 0:
-                    winer = a[0]
-                    loser = b[0]
+                    winer = w
+                    loser = l
                 else:
-                    winer = b[0]
-                    loser = a[0]
+                    winer = l
+                    loser = w
+
                 reportMatch(winer, loser, rnd+1)
 
     print "The winner is " + theWinner()
 
 
 if __name__ == '__main__':
-    # testDeleteMatches()
-    # testDelete()
-    # testCount()
-    # testRegister()
-    # testRegisterCountDelete()
-    # testStandingsBeforeMatches()
-    # testReportMatches()
-    # testPairings()
-    # print "Success!  All tests pass!"
-    # print
+    # To start the test cases, call the following 8 functions.
+    testDeleteMatches()
+    testDelete()
+    testCount()
+    testRegister()
+    testRegisterCountDelete()
+    testStandingsBeforeMatches()
+    testReportMatches()
+    testPairings()
+    print "Success!  All tests pass!"
+    # Ends the calls to the test case functions.
+    print
+    # Ask the user if they want to start a tournament.
     while True:
         n = raw_input("Would you like to Start A New Tournamemnt? y/n: ")
         if n.strip() == 'n' or n.strip() == 'N':

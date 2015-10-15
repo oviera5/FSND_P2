@@ -66,7 +66,8 @@ def playerStandings():
     """Returns a list of the players and their win records, sorted by wins.
 
     The first entry in the list should be the player in first place, or a
-    player tied for first place if there is currently a tie.
+    player tied for first place if there is currently a tie. For extra credit,
+    the left join allows for sorting by opponents matches wins.
 
     Returns:
       A list of tuples, each of which contains (id, name, wins, matches):
@@ -91,6 +92,7 @@ def reportMatch(winner, loser, rnd=1):
     Args:
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
+      rnd:  the current round of the tournament (optional)
     """
     DB = connect()
     cur = DB.cursor()
@@ -113,7 +115,11 @@ def swissPairings(rnd=1):
     Assuming that there are an even number of players registered, each player
     appears exactly once in the pairings.  Each player is paired with another
     player with an equal or nearly-equal win record, that is, a player adjacent
-    to him or her in the standings.
+    to him or her in the standings. For extra credit, the left join and null in
+    the where clause prevents rematches.
+
+    Args:
+      rnd:  the current round of the tournament (optional)
 
     Returns:
       A list of tuples, each of which contains (id1, name1, id2, name2)
@@ -130,18 +136,51 @@ def swissPairings(rnd=1):
         join standings s2 on s1.playerid < s2.playerid
         and s1.wins = s2.wins
         and s1.matches = s2.matches
-        left join trackmatches t on s1.playerid = t.playera
-        and s2.playerid = t.playerb
-        where t.wins is null 
-        and s1.matches = %s and s2.matches = %s
+        join availablematches a on s1.playerid = a.playera
+        and s2.playerid = a.playerb
+        where s1.matches = %s and s2.matches = %s
         order by s1.playerid;""", (rnd, rnd,))
     result = cur.fetchall()
     DB.close()
     return result
 
 
+def checkPairing(winner, loser, rnd):
+    """Returns the number of pairings prior to recording a match.
+
+    Check the pairing to prevent empty tuples due to eliminating rematches.
+
+    Args:
+      winner:  the id number of the player who won
+      loser:  the id number of the player who lost
+      rnd:  the current round of the tournament
+
+    Returns:
+      A number of pairings available if the pairing sent as arguments
+      are recorded as a match.
+
+    """
+    DB = connect()
+    cur = DB.cursor()
+    cur.execute("""select count(1)
+        from standings s1
+        join standings s2 on s1.playerid < s2.playerid
+        and s1.wins = s2.wins
+        and s1.matches = s2.matches
+        join availablematches a on s1.playerid = a.playera
+        and s2.playerid = a.playerb
+        where s1.matches = %s
+          and s2.matches = %s
+          and s1.playerid <> %s and s2.playerid <> %s
+          and s1.playerid <> %s and s2.playerid <> %s;""",
+                (rnd, rnd, winner, loser, loser, winner,))
+    result = cur.fetchone()
+    DB.close()
+    return result[0]
+
+
 def theWinner():
-    """Returns the player name of the winner."""
+    """Returns the winning player's name."""
     DB = connect()
     cur = DB.cursor()
     cur.execute("select playername from standings where (wins/matches) = 1")
